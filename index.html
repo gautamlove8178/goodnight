@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Magic Neon Garden</title>
     <style>
-        /* CSS Same rakha hai */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             height: 100vh; display: flex; justify-content: center; align-items: center;
@@ -19,7 +18,7 @@
         .moon { position: absolute; top: -150px; right: 15%; width: 100px; height: 100px; background: #fefcd7; border-radius: 50%; box-shadow: 0 0 50px 15px rgba(254, 252, 215, 0.5); transition: 3s cubic-bezier(0.22, 1, 0.36, 1); }
         body.night-mode .moon { top: 10%; }
         
-        .text { font-size: 5rem; color: white; opacity: 0; transform: translateY(30px); transition: 2s ease; text-shadow: 0 0 20px rgba(255,255,255,0.8); text-align: center; padding: 20px; }
+        .text { font-size: 3rem; color: white; opacity: 0; transform: translateY(30px); transition: 2s ease; text-shadow: 0 0 20px rgba(255,255,255,0.8); text-align: center; padding: 20px; }
         body.night-mode .text.show { opacity: 1; transform: translateY(0); }
         
         #musicBtn { padding: 15px 40px; font-size: 1.2rem; font-weight: bold; cursor: pointer; border-radius: 50px; border: none; background: #ffebee; color: #ff4081; box-shadow: 0 10px 20px rgba(0,0,0,0.3); z-index: 100; transition: 0.4s; }
@@ -34,7 +33,7 @@
         
         #messages { 
             position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); 
-            text-align: center; color: hsl(190, 100%, 75%); font-size: 2.2rem; 
+            text-align: center; color: hsl(190, 100%, 75%); font-size: 1.8rem; 
             z-index: 120; 
             text-shadow: 0 0 15px rgba(0,242,255,0.6), 2px 2px 5px black;
             pointer-events: none; 
@@ -48,12 +47,12 @@
             background-color: hsl(190, 100%, 75%);
             animation: blink 0.7s infinite;
             margin-left: 5px;
-            height: 2.2rem;
+            height: 1.8rem;
             vertical-align: middle;
         }
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-        @media (max-width: 600px) { .text { font-size: 2.5rem; } #messages { font-size: 1.5rem; } }
+        @media (max-width: 600px) { .text { font-size: 2rem; } #messages { font-size: 1.4rem; } }
     </style>
 </head>
 <body>
@@ -63,7 +62,7 @@
     <div class="sky" id="skyLayer">
         <div class="moon" id="moon"></div>
         <h1 class="text" id="gnText">Good Night Bestie ji 🌙✨💕</h1>
-        <button id="musicBtn">🎵 Play Song & Start</button>
+        <button id="musicBtn">🎵 Click to Play Music & Start</button>
         <button id="mainBtn">Switch to Night</button>
         <button id="cuteBtn">Click here cutie 🥰</button>
     </div>
@@ -71,13 +70,12 @@
     <div id="messages"></div>
 
     <audio id="bgMusic" loop playsinline>
-        <source src="Song.mp3" type="audio/mpeg">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
     </audio>
 
     <canvas id="c"></canvas>
 
 <script>
-    // JS Logic
     const canvas = document.getElementById('c');
     const ctx = canvas.getContext('2d');
     const mainBtn = document.getElementById('mainBtn');
@@ -98,22 +96,27 @@
         "Sach kahun? Tum bahut pyaari ho... \n Good Night Bestie ji 🙈❤️✨"
     ];
 
-    // Fix 2: Music play karne ka behtar tarika
+    // Music Fix Logic
     musicBtn.onclick = () => {
-        bgMusic.play().then(() => {
-            console.log("Music started");
-        }).catch((err) => {
-            console.log("Autoplay blocked, trying again...");
-            // Force play on next click if blocked
-        });
-        musicBtn.style.display = 'none';
-        mainBtn.style.display = 'block';
+        bgMusic.volume = 0.5; // Volume set kiya
+        let playPromise = bgMusic.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log("Music Playing!");
+                musicBtn.style.display = 'none';
+                mainBtn.style.display = 'block';
+            }).catch(error => {
+                console.log("Music Load Error: ", error);
+                // Agar block hua toh direct button change kardo
+                musicBtn.style.display = 'none';
+                mainBtn.style.display = 'block';
+            });
+        }
     };
 
     mainBtn.onclick = () => {
-        // Double check music
-        if(bgMusic.paused) bgMusic.play();
-        
+        bgMusic.play(); // Security ke liye double play
         document.body.classList.add('night-mode');
         gnText.classList.add('show');
         mainBtn.classList.add('fade-out');
@@ -123,9 +126,7 @@
         }, 3000);
     };
 
-    // --- Baki ka animation code jo aapne likha tha (Firefly, Flower, etc.) ---
-    // [Note: Maine aapka baki ka canvas logic same rakha hai taaki garden waisa hi dikhe]
-    
+    // Canvas Logic (Wahi same garden logic)
     let gameActive = false, gardenActive = false, isDragging = false;
     let arrows = [], flowers = [], butterflies = [], stars = [], fireflies = [];
     let heart = { x: 0, y: 150, size: 38, isFalling: false, vy: 0, gravity: 0.22 };
